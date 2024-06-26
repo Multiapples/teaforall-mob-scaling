@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "teaforallmobscaling",
+	"version": "${version}",
+	"name": "TeaForAll Mob Scaling",
+	"description": "Buffs hostile mobs the further from 0,0 they spawn, among other additions.",
+	"authors": [
+		"Multiapples"
+	],
+	"contact": {
+	},
+	"license": "MIT",
+	"icon": "assets/teaforallmobscaling/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.multiapples.ExampleMod"
+		]
+	},
+	"mixins": [
+		"teaforallmobscaling.mixins.json",
+		{
+			"config": "teaforallmobscaling.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

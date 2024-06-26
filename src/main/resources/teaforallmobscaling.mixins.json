@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "io.github.multiapples.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ExampleMixin",
+		"HostileEntityMixin",
+		"HostileEntityAccessor",
+		"MobEntityMixin",
+		"CreeperEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
