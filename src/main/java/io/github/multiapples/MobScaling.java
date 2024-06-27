@@ -6,20 +6,14 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.registry.*;
 import net.minecraft.scoreboard.*;
-import net.minecraft.scoreboard.number.FixedNumberFormat;
-import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.joml.Vector2d;
 
 import java.util.*;
 
@@ -56,7 +50,7 @@ public class MobScaling {
         return scalingEligible.contains(mob.getType());
     }
 
-    public static void initMobScalingPoints(MobEntity mob) {
+    public static void assignMobScalingPoints(MobEntity mob) {
         assert(mob != null);
 
         if (!mobEligibleForScaling(mob)) {
@@ -87,6 +81,7 @@ public class MobScaling {
         assert(mob != null);
 
         // TODO: contact config file to grab these. also this temp code is not thread safe
+        // TODO: populate this in an init method for this class.
         if (tempppp == null) {
             tempppp = new ArrayList<>();
             tempppp.add(new mobScalingModifier("speed_2", 20));

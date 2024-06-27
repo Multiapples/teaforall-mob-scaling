@@ -2,7 +2,6 @@ package io.github.multiapples.mixin;
 
 import io.github.multiapples.MobScaling;
 import net.minecraft.entity.EntityData;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,6 +37,6 @@ public abstract class MobEntityMixin {
         }
         // ==^^==
 
-        MobScaling.initMobScalingPoints(that);
+        MobScaling.assignMobScalingPoints(that);
     }
 }
