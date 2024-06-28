@@ -179,11 +179,16 @@ public class MobScaling {
 
         // Apply health realloc.
         if (NUMBER_OF_POINT_CATEGORIES > 1) {
-            int reallocDelta = (int) (scalingParameters.healthRealloc * budgets[0] / (float) (NUMBER_OF_POINT_CATEGORIES - 1));
-            for (int category = 1; category < NUMBER_OF_POINT_CATEGORIES; category++) {
-                budgets[category] += reallocDelta;
+            int healthCategory = MODIFIER_CATEGORIES.HEALTH.getValue();
+            int reallocDelta = (int) (scalingParameters.healthRealloc * budgets[healthCategory] / (float) (NUMBER_OF_POINT_CATEGORIES - 1));
+            for (MODIFIER_CATEGORIES categoryEnum : MODIFIER_CATEGORIES.values()) {
+                int category = categoryEnum.getValue();
+                if (category == healthCategory) {
+                    budgets[category] -= reallocDelta * (NUMBER_OF_POINT_CATEGORIES - 1);
+                } else {
+                    budgets[category] += reallocDelta;
+                }
             }
-            budgets[0] -= reallocDelta * (NUMBER_OF_POINT_CATEGORIES - 1);
         }
 
         System.out.println("HPP: " + budgets[0]); //TODO remove
@@ -225,11 +230,18 @@ public class MobScaling {
         System.out.println("TCP': " + budgets[2]);
 
         // Dump remaining points into health.
-        for (int category = 1; category < NUMBER_OF_POINT_CATEGORIES; category++) {
-            budgets[0] += budgets[category];
-            budgets[category] = 0;
+        if (NUMBER_OF_POINT_CATEGORIES > 1) {
+            int healthCategory = MODIFIER_CATEGORIES.HEALTH.getValue();
+            for (MODIFIER_CATEGORIES categoryEnum : MODIFIER_CATEGORIES.values()) {
+                int category = categoryEnum.getValue();
+                if (category == healthCategory) {
+                    continue;
+                }
+                budgets[healthCategory] += budgets[category];
+                budgets[category] = 0;
+            }
         }
-        int healthPoints = budgets[0];
+        int healthPoints = budgets[MODIFIER_CATEGORIES.HEALTH.getValue()];
         EntityAttributeInstance attributeInstance = mob.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         if (attributeInstance == null) {
             System.out.println("Null EntityAttributeInstance"); // TODO: Use Logger
