@@ -77,10 +77,12 @@ public class MobScaling {
     private static class ScalingParameters {
         public float healthRealloc; // The fraction of health that gets split among damage and tech points
                                     // before applying modifiers.
+        public int healthCost; // Each health added costs this many points.
         public Map<String, ScalingModifier> modifiersByIdentifier;
 
         public ScalingParameters() {
             healthRealloc = 0f;
+            healthCost = 1;
             modifiersByIdentifier = new HashMap<>();
         }
     }
@@ -122,7 +124,8 @@ public class MobScaling {
         rampingsByDimension.get(DIMENSION.OVERWORLD).add(new Ramping(10, 500, 0, 20, 500, 600));
 
         // Add default scaling parameters
-        defaultScalingParameters.healthRealloc = 0.25f;
+        defaultScalingParameters.healthRealloc = 0.5f;
+        defaultScalingParameters.healthCost = 10;
         defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
                 new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0));
         defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.STRENGTH_2.getValue(),
@@ -131,6 +134,7 @@ public class MobScaling {
         // Add mob overrides
         ScalingParameters override = new ScalingParameters();
         override.healthRealloc = 0.95f;
+        override.healthCost = 20;
         override.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
                 new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0.5f));
         scalingOverridesByMob.put(EntityType.ZOMBIE, override);
@@ -191,7 +195,7 @@ public class MobScaling {
         // Apply health realloc.
         if (NUMBER_OF_POINT_CATEGORIES > 1) {
             int healthCategory = MODIFIER_CATEGORIES.HEALTH.getValue();
-            int reallocDelta = (int) (scalingParameters.healthRealloc * budgets[healthCategory] / (float) (NUMBER_OF_POINT_CATEGORIES - 1));
+            int reallocDelta = (int)(scalingParameters.healthRealloc * budgets[healthCategory] / (float) (NUMBER_OF_POINT_CATEGORIES - 1));
             for (MODIFIER_CATEGORIES categoryEnum : MODIFIER_CATEGORIES.values()) {
                 int category = categoryEnum.getValue();
                 if (category == healthCategory) {
@@ -257,7 +261,7 @@ public class MobScaling {
         if (attributeInstance == null) {
             System.out.println("Null EntityAttributeInstance"); // TODO: Use Logger
         } else {
-            float addHealth = healthPoints * 0.1f;
+            int addHealth = healthPoints / scalingParameters.healthCost;
             attributeInstance.addPersistentModifier(new EntityAttributeModifier(
                     Identifier.of(PERSISTENT_MODIFIER_HEALTH_SCALING),
                     addHealth, EntityAttributeModifier.Operation.ADD_VALUE));
