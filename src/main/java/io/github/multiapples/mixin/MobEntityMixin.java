@@ -37,6 +37,6 @@ public abstract class MobEntityMixin {
         }
         // ==^^==
 
-        MobScaling.assignMobScalingPoints(that);
+        MobScaling.assignMobScaling(that);
     }
 }

@@ -23,6 +23,6 @@ public class ExampleMod implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 
-		MobScaling.populateEligible();
+		MobScaling.initialize();
 	}
 }
