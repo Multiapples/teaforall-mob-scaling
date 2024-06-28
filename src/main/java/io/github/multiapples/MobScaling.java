@@ -20,6 +20,17 @@ import java.util.*;
 
 public class MobScaling {
     private enum DIMENSION { OVERWORLD, NETHER, END }
+    private enum MODIFIERS {
+        SPEED_2("speed-2"),
+        STRENGTH_2("strength-2");
+        private final String value;
+        private MODIFIERS(String value) {
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
     private enum MODIFIER_CATEGORIES {
         HEALTH(0),
         DAMAGE(1),
@@ -31,7 +42,7 @@ public class MobScaling {
         public int getValue() {
             return value;
         }
-    };
+    }
     private static final String OBJECTIVE_SCALING_POINTS = "teaforallscalingpoints";
     private static final String PERSISTENT_MODIFIER_HEALTH_SCALING = "teaforallmobscaling";
     private static final Text scalingPointsLocalization = Text.of("Scaling Points"); // TODO: Localization
@@ -95,16 +106,16 @@ public class MobScaling {
         //Registries.ENTITY_TYPE.get(Identifier.of("ender_dragon")); // returns EntityType<?>; //TODO: make this work
 
         // Init modifier categories
-        categoriesByModifier.put("speed-2", MODIFIER_CATEGORIES.TECH);
-        categoriesByModifier.put("strength-2", MODIFIER_CATEGORIES.DAMAGE);
+        categoriesByModifier.put(MODIFIERS.SPEED_2.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.STRENGTH_2.getValue(), MODIFIER_CATEGORIES.DAMAGE);
         assert(categoriesByModifier.entrySet()
                 .stream()
                 .anyMatch(entry -> isInIntRange(entry.getValue().getValue(), 0, NUMBER_OF_POINT_CATEGORIES - 1)));
 
         // Add eligible mobs for scaling.
-        scalingEligible.add(Registries.ENTITY_TYPE.get(Identifier.of("ghast")));
-        scalingEligible.add(Registries.ENTITY_TYPE.get(Identifier.of("creeper")));
-        scalingEligible.add(Registries.ENTITY_TYPE.get(Identifier.of("zombie")));
+        scalingEligible.add(EntityType.GHAST);
+        scalingEligible.add(EntityType.CREEPER);
+        scalingEligible.add(EntityType.ZOMBIE);
 
         // Add rampings
         rampingsByDimension.put(DIMENSION.OVERWORLD, new ArrayList<>());
@@ -112,16 +123,16 @@ public class MobScaling {
 
         // Add default scaling parameters
         defaultScalingParameters.healthRealloc = 0.25f;
-        defaultScalingParameters.modifiersByIdentifier.put("speed-2",
-                new ScalingModifier("speed-2", 20, 0));
-        defaultScalingParameters.modifiersByIdentifier.put("strength-2",
-                new ScalingModifier("strength-2", 60, 0));
+        defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
+                new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0));
+        defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.STRENGTH_2.getValue(),
+                new ScalingModifier(MODIFIERS.STRENGTH_2.getValue(), 60, 0));
 
         // Add mob overrides
         ScalingParameters override = new ScalingParameters();
         override.healthRealloc = 0.95f;
-        override.modifiersByIdentifier.put("speed-2",
-                new ScalingModifier("speed-2", 20, 0.5f));
+        override.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
+                new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0.5f));
         scalingOverridesByMob.put(EntityType.ZOMBIE, override);
     }
 
