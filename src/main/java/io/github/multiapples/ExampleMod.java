@@ -3,17 +3,24 @@ package io.github.multiapples;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.item.v1.FabricItem;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.registry.*;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+
 public class ExampleMod implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("teaforallmobscaling");
+    public static final Logger logger = LoggerFactory.getLogger("teaforallmobscaling");
+	public static Config config = null;
 
 	@Override
 	public void onInitialize() {
@@ -21,8 +28,20 @@ public class ExampleMod implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		logger.info("Initializing Example Mod");
 
+		URI configFilePath = FabricLoader.getInstance().getConfigDir().resolve("teaforall-mob-scaling.json").toUri();
+		try {
+			config = Config.load(new File(configFilePath));
+		} catch (FileNotFoundException e) {
+			logger.info("Config file missing. Creating default config file at " + configFilePath.toASCIIString() + ".");
+			config = new Config();
+			try {
+				Config.save(new File(configFilePath), config);
+			} catch (IOException e2) {
+				logger.warn("Could not write file to " + configFilePath.toASCIIString() + ".");
+			}
+		}
 		MobScaling.initialize();
 	}
 }
