@@ -94,11 +94,6 @@ public class MobScaling {
         //Registries.ENTITY_TYPE.containsId(Identifier.of("ender_dragon"));
         //Registries.ENTITY_TYPE.get(Identifier.of("ender_dragon")); // returns EntityType<?>; //TODO: make this work
 
-        int rand = Random.create().nextInt();
-        System.out.println(rand);
-        assert rand == 15;
-        System.out.println(rand);
-
         // Init modifier categories
         categoriesByModifier.put("speed-2", MODIFIER_CATEGORIES.TECH);
         categoriesByModifier.put("strength-2", MODIFIER_CATEGORIES.DAMAGE);
