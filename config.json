@@ -1,0 +1,76 @@
+{
+  "netherDOT": false,
+  "dragonBuffsMobs": false,
+  "dragonBuffsMobsPoints": 2000,
+  "fartherStrongholdGen": false,
+  "fartherStrongholdGenOffset": 4000,
+  "mobScaling": {
+    "xpScaling": false,
+    "eligibleMobs": [
+      "skeleton",
+      "zombie",
+      "creeper"
+    ],
+    "rampings": {
+      "overworld": [
+        {
+          "startDist": 50,
+          "endDist": 500,
+          "startMinPoints": 20,
+          "startMaxPoints": 40,
+          "endMinPoint": 500,
+          "endMaxPoint": 1000
+        }
+      ],
+      "nether": [
+        {
+          "startDist": 50,
+          "endDist": 500,
+          "startMinPoints": 20,
+          "startMaxPoints": 40,
+          "endMinPoint": 500,
+          "endMaxPoint": 1000
+        }
+      ],
+      "end": [
+        {
+          "startDist": 50,
+          "endDist": 500,
+          "startMinPoints": 20,
+          "startMaxPoints": 40,
+          "endMinPoint": 500,
+          "endMaxPoint": 1000
+        }
+      ]
+    },
+    "defaultScaling": {
+      "healthRealloc": 0.95,
+      "healthCost": 10,
+      "modifiers": {
+        "speed-2": {
+          "cost": 20,
+          "failureChance": 0
+        }
+      }
+    },
+    "mobScalingOverrides": {
+      "healthRealloc": 0.05,
+      "creeper": {
+        "modifiers": {
+          "speed-2": {
+            "cost": 15,
+            "failureChance": 50
+          }
+        }
+      },
+      "skeleton": {
+        "healthCost": 10,
+        "modifiers": {
+          "strength-2": {
+            "cost": 30
+          }
+        }
+      }
+    }
+  }
+}

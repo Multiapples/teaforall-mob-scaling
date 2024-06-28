@@ -72,6 +72,11 @@ public class MobScaling {
             this.endMinPoints = endMinPoints;
             this.endMaxPoints = endMaxPoints;
         }
+
+        public boolean inRange(float dist) {
+            return startDist <= dist && dist <= endDist;
+        }
+
     }
 
     private static class ScalingParameters {
@@ -122,6 +127,8 @@ public class MobScaling {
         // Add rampings
         rampingsByDimension.put(DIMENSION.OVERWORLD, new ArrayList<>());
         rampingsByDimension.get(DIMENSION.OVERWORLD).add(new Ramping(10, 500, 0, 20, 500, 600));
+        rampingsByDimension.put(DIMENSION.NETHER, new ArrayList<>());
+        rampingsByDimension.put(DIMENSION.END, new ArrayList<>());
 
         // Add default scaling parameters
         defaultScalingParameters.healthRealloc = 0.5f;
@@ -159,9 +166,19 @@ public class MobScaling {
         }
 
         // Find and use ramping
-        // TODO RAMPING
-        int scalingPoints = Math.clamp(Math.round(pos.multiply(1, 0, 1).length() / 100f),
-                0, Integer.MAX_VALUE); // Randomize here
+        Random random = mob.getRandom();
+        float dist = (float)pos.multiply(1, 0, 1).length();
+        int scalingPoints = 0;
+        List<Ramping> rampings = rampingsByDimension.get(dimension);
+        for (Ramping ramp : rampings) {
+            if (!ramp.inRange(dist)) {
+                continue;
+            }
+            int pointsMin = (int)MathHelper.map(dist, ramp.startDist, ramp.endDist, ramp.startMinPoints, ramp.endMinPoints);
+            int pointsMax = (int)MathHelper.map(dist, ramp.startDist, ramp.endDist, ramp.startMaxPoints, ramp.endMaxPoints);
+            scalingPoints = random.nextBetween(pointsMin, pointsMax);
+            break;
+        }
         setScalingPoints(mob, scalingPoints);
         scaleMobEntity(mob, scalingPoints);
     }
@@ -182,10 +199,6 @@ public class MobScaling {
         }
 
         Random random = mob.getRandom();
-        boolean canHaveMobSpecificModifiers = false; //TODO
-        boolean canHavePotions = true;
-        boolean canHaveWeapons = false;
-
         ScalingParameters scalingParameters = getMobScalingParameters(mob);
         List<ScalingModifier> modifiers = new ArrayList<>(scalingParameters.modifiersByIdentifier.values()); // Maybe not the most efficient thing
 
