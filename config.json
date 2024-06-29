@@ -1,12 +1,7 @@
 {
   "netherDOT": false,
   "netherDOTYlevel": 123.5,
-  "dragonBuffsMobs": false,
-  "dragonBuffsMobsPoints": 2000,
-  "fartherStrongholdGen": false,
-  "fartherStrongholdGenOffset": 4000,
   "mobScaling": {
-    "xpScaling": false,
     "eligibleMobs": [
       "skeleton",
       "zombie",

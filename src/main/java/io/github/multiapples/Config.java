@@ -9,10 +9,7 @@ public class Config {
 
     public final boolean netherDOT = true;
     public final float netherDOTYlevel = 123.5f;
-    public final boolean dragonBuffsMobs = true;
-    public final int dragonBuffsMobsPoints = 3000;
-    public final boolean fartherStrongholdGen = true;
-    public final int fartherStrongholdGenOffset = 5000;
+    public final int eyeOfEnderDeadZone = 11000;
     public final JsonObject mobScaling = defaultMobScalingJson();
     private final JsonObject defaultMobScalingJson = null;
 
