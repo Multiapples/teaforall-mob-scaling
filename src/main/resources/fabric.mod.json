@@ -18,11 +18,7 @@
 		]
 	},
 	"mixins": [
-		"teaforallmobscaling.mixins.json",
-		{
-			"config": "teaforallmobscaling.client.mixins.json",
-			"environment": "client"
-		}
+		"teaforallmobscaling.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.15.11",
