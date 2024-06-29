@@ -6,7 +6,6 @@
     "ConcentricRingsStructurePlacementMixin",
     "CreeperEntityMixin",
     "EnderDragonFightMixin",
-    "ExampleMixin",
     "MobEntityMixin",
     "PlayerEntityMixin"
   ],
