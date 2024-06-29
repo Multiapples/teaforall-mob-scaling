@@ -1,6 +1,7 @@
 {
-  "netherDOT": false,
+  "netherDOT": true,
   "netherDOTYlevel": 123.5,
+  "strongholdDeadZone": 6000.0,
   "mobScaling": {
     "eligibleMobs": [
       "zombie",
@@ -49,30 +50,30 @@
       "overworld": [
         {
           "startDist": 0,
-          "endDist": 500,
+          "endDist": 3500,
           "startMinPoints": -50,
           "startMaxPoints": -20,
           "endMinPoints": 40,
           "endMaxPoints": 70
         },
         {
-          "startDist": 500,
-          "endDist": 900,
+          "startDist": 3500,
+          "endDist": 6500,
           "startMinPoints": 70,
           "startMaxPoints": 110,
           "endMinPoints": 220,
           "endMaxPoints": 330
         },
         {
-          "startDist": 900,
-          "endDist": 1500,
+          "startDist": 6500,
+          "endDist": 10000,
           "startMinPoints": 240,
           "startMaxPoints": 560,
           "endMinPoints": 340,
           "endMaxPoints": 660
         },
         {
-          "startDist": 1500,
+          "startDist": 10000,
           "endDist": 30000,
           "startMinPoints": 400,
           "startMaxPoints": 700,
@@ -143,11 +144,11 @@
         },
         "speed-4": {
           "cost": 300,
-          "failureChance": 0
+          "failureChance": 0.05
         },
         "speed-5": {
           "cost": 500,
-          "failureChance": 0
+          "failureChance": 0.1
         },
         "strength-1": {
           "cost": 50,
@@ -159,15 +160,15 @@
         },
         "strength-3": {
           "cost": 200,
-          "failureChance": 0
+          "failureChance": 0.05
         },
         "strength-4": {
           "cost": 300,
-          "failureChance": 0
+          "failureChance": 0.1
         },
         "invisibility": {
           "cost": 200,
-          "failureChance": 0.99
+          "failureChance": 0.95
         }
       }
     },
@@ -185,14 +186,20 @@
         "healthCost": 6
       },
       "zombie_villager": {
-        "healthCost": 6
+        "healthCost": 6,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 20,
+            "failureChance": 0
+          }
+        }
       },
       "husk": {
         "healthCost": 6,
         "modifiers": {
           "fire-resistance": {
-            "cost": 150,
-            "failureChance": 0.5
+            "cost": 20,
+            "failureChance": 0.25
           },
           "resistance-1": {
             "cost": 150,
@@ -280,7 +287,17 @@
         "healthCost": 4
       },
       "enderman": {
-        "healthCost": 25
+        "healthCost": 25,
+        "modifiers": {
+          "invisibility": {
+            "cost": 10,
+            "failureChance": 0.8
+          },
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.2
+          }
+        }
       },
       "shulker": {
         "healthCost": 50

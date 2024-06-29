@@ -320,9 +320,9 @@ public class MobScaling {
             }
         }
 
-        System.out.println("HPP: " + budgets[0]); //TODO remove
-        System.out.println("DMG: " + budgets[1]);
-        System.out.println("TCP: " + budgets[2]);
+        //System.out.println("HPP: " + budgets[0]); //TODO remove
+        //System.out.println("DMG: " + budgets[1]);
+        //System.out.println("TCP: " + budgets[2]);
 
         int[] order = shuffledRange(random, modifiers.size());
         for (int i : order) {
@@ -342,7 +342,7 @@ public class MobScaling {
             }
 
             // Apply the modifier
-            System.out.println("Applying " + mod.identifier); // TODO: remove
+            //System.out.println("Applying " + mod.identifier); // TODO: remove
             budgets[category] -= mod.cost;
             switch (mod.identifier) {
                 case SPEED_1 ->
@@ -374,9 +374,9 @@ public class MobScaling {
             }
         }
 
-        System.out.println("HPP': " + budgets[0]); //TODO remove
-        System.out.println("DMG': " + budgets[1]);
-        System.out.println("TCP': " + budgets[2]);
+        //System.out.println("HPP': " + budgets[0]); //TODO remove
+        //System.out.println("DMG': " + budgets[1]);
+        //System.out.println("TCP': " + budgets[2]);
 
         // Dump remaining points into health.
         if (NUMBER_OF_POINT_CATEGORIES > 1) {
