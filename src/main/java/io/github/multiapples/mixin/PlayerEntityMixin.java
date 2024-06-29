@@ -27,7 +27,7 @@ public abstract class PlayerEntityMixin {
             boolean success = that.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER,
                     60, 1, false, true, true));
             if (success) {
-                that.sendMessage(Text.of("Somewhere, a Dragon forbids you..."), true);
+                that.sendMessage(Text.of("Somewhere, a dragon forbids you..."), true);
             }
         }
     }
