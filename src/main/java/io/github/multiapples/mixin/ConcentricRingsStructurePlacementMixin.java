@@ -15,8 +15,11 @@ public abstract class ConcentricRingsStructurePlacementMixin {
     @Inject(method = "Lnet/minecraft/world/gen/chunk/placement/ConcentricRingsStructurePlacement;isStartChunk(Lnet/minecraft/world/gen/chunk/placement/StructurePlacementCalculator;II)Z",
     at = @At("HEAD"), cancellable = true)
     protected void isStartChunk(StructurePlacementCalculator calculator, int chunkX, int chunkZ, CallbackInfoReturnable<Boolean> cir) {
+        // Disallows structures using the concentric ring placement (basically just strongholds) from
+        // being recognized within a certain radius around (0,0).
         double chunkDistSqr = new Vec2f(chunkX, chunkZ).lengthSquared();
-        if (chunkDistSqr * 16 * 16 <= Math.pow(TeaForAllMobScaling.config.strongholdDeadZone, 2)) {
+        double deadZone = TeaForAllMobScaling.config.strongholdDeadZone;
+        if (chunkDistSqr * 16 * 16 <= Math.pow(deadZone, 2)) {
             cir.setReturnValue(false);
             cir.cancel();
         }

@@ -324,10 +324,6 @@ public class MobScaling {
             }
         }
 
-        //System.out.println("HPP: " + budgets[0]); //TODO remove
-        //System.out.println("DMG: " + budgets[1]);
-        //System.out.println("TCP: " + budgets[2]);
-
         int[] order = shuffledRange(random, modifiers.size());
         for (int i : order) {
             ScalingModifier mod = modifiers.get(i);
@@ -345,7 +341,6 @@ public class MobScaling {
             }
 
             // Apply the modifier
-            //System.out.println("Applying " + mod.identifier); // TODO: remove
             budgets[category] -= mod.cost;
             switch (mod.identifier) {
                 case SPEED_1 ->
@@ -377,10 +372,6 @@ public class MobScaling {
             }
         }
 
-        //System.out.println("HPP': " + budgets[0]); //TODO remove
-        //System.out.println("DMG': " + budgets[1]);
-        //System.out.println("TCP': " + budgets[2]);
-
         // Dump remaining points into health.
         if (NUMBER_OF_POINT_CATEGORIES > 1) {
             int healthCategory = MODIFIER_CATEGORIES.HEALTH.getValue();
@@ -404,9 +395,6 @@ public class MobScaling {
                     addHealth, EntityAttributeModifier.Operation.ADD_VALUE));
             mob.heal(healthPoints);
         }
-
-        // Glow for now, for testing: //TODO, remove
-        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, StatusEffectInstance.INFINITE, 0));
     }
 
     public static ScoreboardObjective getScalingObjective(Scoreboard scoreboard) {

@@ -22,21 +22,7 @@ public abstract class MobEntityMixin {
                               @Nullable EntityData entityData, CallbackInfoReturnable<EntityData> cir) {
         // This method gets injected into MobEntity#initialize() after it initializes the mob and right before
         // it returns entityData.
-        // world.toServerWorld(). ??how to get ender dragon defeated?
         MobEntity that = (MobEntity)(Object)this;
-
-        // ==vv== debug info to the nearest player. TODO: remove this
-        PlayerEntity p = world.getClosestPlayer(that, 16);
-        if (p != null) {
-            String msg = that.getPos().toString();
-            if (that.getEntityWorld().getRegistryKey() == World.OVERWORLD) { msg += " OVERWORLD"; }
-            else if (that.getEntityWorld().getRegistryKey() == World.NETHER) { msg += " NETHER"; }
-            else if (that.getEntityWorld().getRegistryKey() == World.END) { msg += " END"; }
-            else { msg += " OTHER"; }
-            p.sendMessage(Text.of(msg));
-        }
-        // ==^^==
-
         MobScaling.assignMobScaling(that);
     }
 }
