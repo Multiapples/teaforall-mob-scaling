@@ -24,7 +24,7 @@ public class TeaForAllMobScaling implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		logger.info("Initializing Example Mod");
+		logger.info("Initializing TeaForAll Mob Scaling");
 
 		URI configFilePath = FabricLoader.getInstance().getConfigDir().resolve("teaforall-mob-scaling.json").toUri();
 		try {

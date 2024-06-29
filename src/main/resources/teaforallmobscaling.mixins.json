@@ -1,14 +1,15 @@
 {
-	"required": true,
-	"package": "io.github.multiapples.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ExampleMixin",
-		"PlayerEntityMixin",
-		"MobEntityMixin",
-		"CreeperEntityMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "io.github.multiapples.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "CreeperEntityMixin",
+    "EnderDragonFightMixin",
+    "ExampleMixin",
+    "MobEntityMixin",
+    "PlayerEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin {
-    @Inject(method="Lnet/minecraft/entity/player/PlayerEntity;tick()V", at=@At("TAIL"))
+    @Inject(method = "Lnet/minecraft/entity/player/PlayerEntity;tick()V", at = @At("TAIL"))
     protected void tick(CallbackInfo ci) {
         PlayerEntity that = (PlayerEntity)(Object)this;
         if (that.getEntityWorld().getRegistryKey() == World.NETHER) {
