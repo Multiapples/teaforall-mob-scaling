@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.logging.LogUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -70,6 +71,7 @@ public class MobScaling {
     private static final ScalingParameters defaultScalingParameters = new ScalingParameters();
     private static final Map<EntityType<?>, ScalingParameters> scalingOverridesByMob = new HashMap<>();
     private static final Map<String, MODIFIER_CATEGORIES> categoriesByModifier = new HashMap<>();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static class Ramping {
         public float startDist, endDist;
@@ -136,10 +138,7 @@ public class MobScaling {
         }
     }
 
-    public static void initialize(Config config, Logger logger) throws IllegalStateException { //TODO: take a config parameter
-        //Registries.ENTITY_TYPE.containsId(Identifier.of("ender_dragon"));
-        //Registries.ENTITY_TYPE.get(Identifier.of("ender_dragon")); // returns EntityType<?>; //TODO: make this work
-
+    public static void initialize(Config config) throws IllegalStateException {
         JsonObject json = config.mobScaling;
 
         // Init modifier categories
@@ -159,13 +158,18 @@ public class MobScaling {
                 .stream()
                 .anyMatch(entry -> isInIntRange(entry.getValue().getValue(), 0, NUMBER_OF_POINT_CATEGORIES - 1))))
             throw new AssertionError();
+        for (MODIFIERS identifier : MODIFIERS.values()) {
+            if (!categoriesByModifier.containsKey(identifier.getValue())) {
+                throw new AssertionError("Modifier " + identifier.getValue() + " lacks associated points category");
+            }
+        }
 
         // Add eligible mobs for scaling.
         JsonArray jsonEligibleMobs = json.getAsJsonArray("eligibleMobs");
         for (JsonElement e : jsonEligibleMobs.asList()) {
             String mobId = new JsonOption<>(e).unwrapAsString();
             if (mobId == null || !Registries.ENTITY_TYPE.containsId(Identifier.of(mobId))) {
-                logger.info("Invalid mob identifier \"" + mobId + "\" in config $mobScaling.eligibleMobs");
+                LOGGER.info("Invalid mob identifier \"" + mobId + "\" in config $mobScaling.eligibleMobs");
                 throw new IllegalStateException();
             }
             scalingEligible.add(Registries.ENTITY_TYPE.get(Identifier.of(mobId)));
@@ -199,7 +203,7 @@ public class MobScaling {
             String identifier = entry.getKey();
             JsonObject body = entry.getValue().getAsJsonObject();
             if (!MODIFIERS.BY_IDENTIFIER.containsKey(identifier)) {
-                logger.info("Invalid modifier \"" + identifier + "\" in config $mobScaling.defaultScaling.modifiers");
+                LOGGER.info("Invalid modifier \"" + identifier + "\" in config $mobScaling.defaultScaling.modifiers");
                 throw new IllegalStateException();
             }
             int cost = body.getAsJsonPrimitive("cost").getAsInt();
@@ -214,7 +218,7 @@ public class MobScaling {
             String identifier = entry.getKey();
             JsonObject body = entry.getValue().getAsJsonObject();
             if (!Registries.ENTITY_TYPE.containsId(Identifier.of(identifier))) {
-                logger.info("Invalid entity \"" + identifier + "\" in config $mobScaling.mobScalingOverrides");
+                LOGGER.info("Invalid entity \"" + identifier + "\" in config $mobScaling.mobScalingOverrides");
                 throw new IllegalStateException();
             }
             JsonObject jsonOverrideModifiers = body.getAsJsonObject("modifiers");
@@ -226,7 +230,7 @@ public class MobScaling {
                     String modIdentifierStr = modEntry.getKey();
                     JsonObject modBody = modEntry.getValue().getAsJsonObject();
                     if (!MODIFIERS.BY_IDENTIFIER.containsKey(modIdentifierStr)) {
-                        logger.info("Invalid modifier \"" + modIdentifierStr + "\" in config $mobScaling.mobScalingOverrides." + identifier + ".modifiers");
+                        LOGGER.info("Invalid modifier \"" + modIdentifierStr + "\" in config $mobScaling.mobScalingOverrides." + identifier + ".modifiers");
                         throw new IllegalStateException();
                     }
                     MODIFIERS modIdentifier = MODIFIERS.BY_IDENTIFIER.get(modIdentifierStr);
@@ -329,7 +333,6 @@ public class MobScaling {
             ScalingModifier mod = modifiers.get(i);
 
             if (!categoriesByModifier.containsKey(mod.identifier.getValue())) {
-                System.out.println("Warning, modifier lacks associated points category"); //TODO use logger
                 continue;
             }
             int category = categoriesByModifier.get(mod.identifier.getValue()).getValue();
@@ -370,7 +373,7 @@ public class MobScaling {
                 case RESISTANCE_1 ->
                         mob.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, StatusEffectInstance.INFINITE, 0));
                 default ->
-                        System.out.println("uh oh, " + mod.identifier.getValue() + " was not a valid modifier!!!"); //TODO: use logger
+                        LOGGER.warn(mod.identifier.getValue() + " is not a valid modifier.");
             }
         }
 
@@ -393,7 +396,7 @@ public class MobScaling {
         int healthPoints = budgets[MODIFIER_CATEGORIES.HEALTH.getValue()];
         EntityAttributeInstance attributeInstance = mob.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         if (attributeInstance == null) {
-            System.out.println("Null EntityAttributeInstance"); // TODO: Use Logger
+            LOGGER.warn("Could not scale max health for entity " + mob.getType().getName().toString() + " due to null EntityAttributeInstance");
         } else {
             int addHealth = healthPoints / scalingParameters.healthCost;
             attributeInstance.addPersistentModifier(new EntityAttributeModifier(

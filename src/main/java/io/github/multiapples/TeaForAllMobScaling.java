@@ -38,6 +38,6 @@ public class TeaForAllMobScaling implements ModInitializer {
 				logger.warn("Could not write file to " + configFilePath.toASCIIString() + ".");
 			}
 		}
-		MobScaling.initialize(config, logger);
+		MobScaling.initialize(config);
 	}
 }
