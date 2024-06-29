@@ -1,5 +1,9 @@
 package io.github.multiapples;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -15,14 +19,18 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.slf4j.Logger;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MobScaling {
     private enum DIMENSION { OVERWORLD, NETHER, END }
     private enum MODIFIERS {
         SPEED_2("speed-2"),
         STRENGTH_2("strength-2");
+        public static final Map<String, MODIFIERS> BY_IDENTIFIER = Arrays.stream(MODIFIERS.values())
+                .collect(Collectors.toMap(MODIFIERS::getValue, e -> e));
         private final String value;
         private MODIFIERS(String value) {
             this.value = value;
@@ -61,10 +69,10 @@ public class MobScaling {
         public Ramping(final float startDist, final float endDist,
                        final int startMinPoints, final int startMaxPoints,
                        final int endMinPoints, final int endMaxPoints) {
-            assert(startDist >= 0f);
-            assert(endDist > startDist);
-            assert(startMinPoints <= startMaxPoints);
-            assert(endMinPoints <= endMaxPoints);
+            if (!(startDist >= 0f)) throw new AssertionError();
+            if (!(endDist > startDist)) throw new AssertionError();
+            if (!(startMinPoints <= startMaxPoints)) throw new AssertionError();
+            if (!(endMinPoints <= endMaxPoints)) throw new AssertionError();
             this.startDist = startDist;
             this.endDist = endDist;
             this.startMinPoints = startMinPoints;
@@ -83,72 +91,144 @@ public class MobScaling {
         public float healthRealloc; // The fraction of health that gets split among damage and tech points
                                     // before applying modifiers.
         public int healthCost; // Each health added costs this many points.
-        public Map<String, ScalingModifier> modifiersByIdentifier;
+        public Map<MODIFIERS, ScalingModifier> modifiersByIdentifier;
 
         public ScalingParameters() {
             healthRealloc = 0f;
             healthCost = 1;
             modifiersByIdentifier = new HashMap<>();
         }
+
+        public ScalingParameters(ScalingParameters src) {
+            healthRealloc = src.healthRealloc;
+            healthCost = src.healthCost;
+            modifiersByIdentifier = src.modifiersByIdentifier.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> new ScalingModifier(e.getValue())));
+        }
     }
 
     private static class ScalingModifier {
-        public String identifier; //TODO: use an enum
+        public MODIFIERS identifier;
         public int cost;
         public float failureChance;
 
-        public ScalingModifier(final String identifier, final int cost, final float failureChance) {
-            assert(identifier != null);
-            assert(cost >= 0);
-            assert(failureChance >= 0f);
-            assert(failureChance <= 1f);
+        public ScalingModifier(final ScalingModifier src) {
+            this(src.identifier, src.cost, src.failureChance);
+        }
+        public ScalingModifier(final MODIFIERS identifier, final int cost, final float failureChance) {
+            if (!(identifier != null)) throw new AssertionError();
+            if (!(cost >= 0)) throw new AssertionError();
+            if (!(failureChance >= 0f)) throw new AssertionError();
+            if (!(failureChance <= 1f)) throw new AssertionError();
             this.identifier = identifier;
             this.cost = cost;
             this.failureChance = failureChance;
         }
     }
 
-    public static void initialize() { //TODO: take a config parameter
+    public static void initialize(Config config, Logger logger) throws IllegalStateException { //TODO: take a config parameter
         //Registries.ENTITY_TYPE.containsId(Identifier.of("ender_dragon"));
         //Registries.ENTITY_TYPE.get(Identifier.of("ender_dragon")); // returns EntityType<?>; //TODO: make this work
+
+        JsonObject json = config.mobScaling;
 
         // Init modifier categories
         categoriesByModifier.put(MODIFIERS.SPEED_2.getValue(), MODIFIER_CATEGORIES.TECH);
         categoriesByModifier.put(MODIFIERS.STRENGTH_2.getValue(), MODIFIER_CATEGORIES.DAMAGE);
-        assert(categoriesByModifier.entrySet()
+        if (!(categoriesByModifier.entrySet()
                 .stream()
-                .anyMatch(entry -> isInIntRange(entry.getValue().getValue(), 0, NUMBER_OF_POINT_CATEGORIES - 1)));
+                .anyMatch(entry -> isInIntRange(entry.getValue().getValue(), 0, NUMBER_OF_POINT_CATEGORIES - 1))))
+            throw new AssertionError();
 
         // Add eligible mobs for scaling.
-        scalingEligible.add(EntityType.GHAST);
-        scalingEligible.add(EntityType.CREEPER);
-        scalingEligible.add(EntityType.ZOMBIE);
+        JsonArray jsonEligibleMobs = json.getAsJsonArray("eligibleMobs");
+        for (JsonElement e : jsonEligibleMobs.asList()) {
+            String mobId = new JsonOption<>(e).unwrapAsString();
+            if (mobId == null || !Registries.ENTITY_TYPE.containsId(Identifier.of(mobId))) {
+                logger.info("Invalid mob identifier \"" + mobId + "\" in config $mobScaling.eligibleMobs");
+                throw new IllegalStateException();
+            }
+            scalingEligible.add(Registries.ENTITY_TYPE.get(Identifier.of(mobId)));
+        }
 
         // Add rampings
+        JsonObject jsonRampings = json.getAsJsonObject("rampings");
+        Gson gson = new Gson();
         rampingsByDimension.put(DIMENSION.OVERWORLD, new ArrayList<>());
-        rampingsByDimension.get(DIMENSION.OVERWORLD).add(new Ramping(10, 500, 0, 20, 500, 600));
+        JsonArray jsonOverworld = jsonRampings.getAsJsonArray("overworld");
+        for (JsonElement ramp : jsonOverworld.asList()) {
+            rampingsByDimension.get(DIMENSION.OVERWORLD).add(gson.fromJson(ramp, Ramping.class));
+        }
         rampingsByDimension.put(DIMENSION.NETHER, new ArrayList<>());
+        JsonArray jsonNether = jsonRampings.getAsJsonArray("nether");
+        for (JsonElement ramp : jsonNether.asList()) {
+            rampingsByDimension.get(DIMENSION.NETHER).add(gson.fromJson(ramp, Ramping.class));
+        }
         rampingsByDimension.put(DIMENSION.END, new ArrayList<>());
+        JsonArray jsonEnd = jsonRampings.getAsJsonArray("end");
+        for (JsonElement ramp : jsonEnd.asList()) {
+            rampingsByDimension.get(DIMENSION.END).add(gson.fromJson(ramp, Ramping.class));
+        }
 
         // Add default scaling parameters
-        defaultScalingParameters.healthRealloc = 0.5f;
-        defaultScalingParameters.healthCost = 10;
-        defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
-                new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0));
-        defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.STRENGTH_2.getValue(),
-                new ScalingModifier(MODIFIERS.STRENGTH_2.getValue(), 60, 0));
+        JsonObject jsonDefaultScaling = json.getAsJsonObject("defaultScaling");
+        defaultScalingParameters.healthRealloc = jsonDefaultScaling.getAsJsonPrimitive("healthRealloc").getAsFloat();
+        defaultScalingParameters.healthCost = jsonDefaultScaling.getAsJsonPrimitive("healthCost").getAsInt();
+        JsonObject jsonDefaultModifiers = jsonDefaultScaling.getAsJsonObject("modifiers");
+        for (Map.Entry<String, JsonElement> entry : jsonDefaultModifiers.asMap().entrySet()) {
+            String identifier = entry.getKey();
+            JsonObject body = entry.getValue().getAsJsonObject();
+            if (!MODIFIERS.BY_IDENTIFIER.containsKey(identifier)) {
+                logger.info("Invalid modifier \"" + identifier + "\" in config $mobScaling.defaultScaling.modifiers");
+                throw new IllegalStateException();
+            }
+            int cost = body.getAsJsonPrimitive("cost").getAsInt();
+            float failureChance = body.getAsJsonPrimitive("failureChance").getAsFloat();
+            defaultScalingParameters.modifiersByIdentifier.put(MODIFIERS.BY_IDENTIFIER.get(identifier),
+                    new ScalingModifier(MODIFIERS.BY_IDENTIFIER.get(identifier), cost, failureChance));
+        }
 
         // Add mob overrides
-        ScalingParameters override = new ScalingParameters();
-        override.healthRealloc = 0.95f;
-        override.healthCost = 20;
-        override.modifiersByIdentifier.put(MODIFIERS.SPEED_2.getValue(),
-                new ScalingModifier(MODIFIERS.SPEED_2.getValue(), 20, 0.5f));
-        scalingOverridesByMob.put(EntityType.ZOMBIE, override);
+        JsonObject jsonOverrides = json.getAsJsonObject("mobScalingOverrides");
+        for (Map.Entry<String, JsonElement> entry : jsonOverrides.asMap().entrySet()) {
+            String identifier = entry.getKey();
+            JsonObject body = entry.getValue().getAsJsonObject();
+            if (!Registries.ENTITY_TYPE.containsId(Identifier.of(identifier))) {
+                logger.info("Invalid entity \"" + identifier + "\" in config $mobScaling.mobScalingOverrides");
+                throw new IllegalStateException();
+            }
+            JsonObject jsonOverrideModifiers = body.getAsJsonObject("modifiers");
+            ScalingParameters override = new ScalingParameters(defaultScalingParameters);
+            override.healthRealloc = new JsonOption<>(body).get("healthRealloc").unwrapAsNumber(defaultScalingParameters.healthRealloc).floatValue();
+            override.healthCost = new JsonOption<>(body).get("healthCost").unwrapAsNumber(defaultScalingParameters.healthCost).intValue();
+            for (Map.Entry<String, JsonElement> modEntry : jsonOverrideModifiers.asMap().entrySet()) {
+                String modIdentifierStr = modEntry.getKey();
+                JsonObject modBody = modEntry.getValue().getAsJsonObject();
+                if (!MODIFIERS.BY_IDENTIFIER.containsKey(modIdentifierStr)) {
+                    logger.info("Invalid modifier \"" + modIdentifierStr + "\" in config $mobScaling.mobScalingOverrides." + identifier + ".modifiers");
+                    throw new IllegalStateException();
+                }
+                MODIFIERS modIdentifier = MODIFIERS.BY_IDENTIFIER.get(modIdentifierStr);
+                JsonOption<JsonElement> cost = new JsonOption<>(modBody).get("cost");
+                JsonOption<JsonElement> failureChance = new JsonOption<>(modBody).get("failureChance");
+                if (override.modifiersByIdentifier.containsKey(modIdentifier)) {
+                    if (cost.elementExists())
+                        override.modifiersByIdentifier.get(modIdentifier).cost = cost.unwrapAsNumber().intValue();
+                    if (failureChance.elementExists())
+                        override.modifiersByIdentifier.get(modIdentifier).failureChance = failureChance.unwrapAsNumber().floatValue();
+                } else {
+                    override.modifiersByIdentifier.put(modIdentifier,
+                            new ScalingModifier(modIdentifier, cost.unwrapAsNumber().intValue(),
+                                    failureChance.unwrapAsNumber().floatValue()));
+                }
+            }
+            scalingOverridesByMob.put(Registries.ENTITY_TYPE.get(Identifier.of(identifier)), override);
+        }
     }
 
     public static void assignMobScaling(MobEntity mob) {
-        assert(mob != null);
+        if (!(mob != null)) throw new AssertionError();
 
         if (!mobEligibleForScaling(mob)) {
             return;
@@ -184,7 +264,7 @@ public class MobScaling {
     }
 
     public static ScalingParameters getMobScalingParameters(MobEntity mob) {
-        assert(mob != null);
+        if (!(mob != null)) throw new AssertionError();
 
         if (scalingOverridesByMob.containsKey(mob.getType())) {
             return scalingOverridesByMob.get(mob.getType());
@@ -193,7 +273,7 @@ public class MobScaling {
     }
 
     public static void scaleMobEntity(MobEntity mob, int scalingPoints) {
-        assert(mob != null);
+        if (!(mob != null)) throw new AssertionError();
         if (scalingPoints <= 0) {
             return;
         }
@@ -203,7 +283,7 @@ public class MobScaling {
         List<ScalingModifier> modifiers = new ArrayList<>(scalingParameters.modifiersByIdentifier.values()); // Maybe not the most efficient thing
 
         int[] budgets = partitionInt(mob.getRandom(), scalingPoints, 3); // Point budgets for each modifier category.
-        assert(budgets.length == NUMBER_OF_POINT_CATEGORIES);
+        if (!(budgets.length == NUMBER_OF_POINT_CATEGORIES)) throw new AssertionError();
 
         // Apply health realloc.
         if (NUMBER_OF_POINT_CATEGORIES > 1) {
@@ -227,11 +307,11 @@ public class MobScaling {
         for (int i : order) {
             ScalingModifier mod = modifiers.get(i);
 
-            if (!categoriesByModifier.containsKey(mod.identifier)) {
+            if (!categoriesByModifier.containsKey(mod.identifier.getValue())) {
                 System.out.println("Warning, modifier lacks associated points category"); //TODO use logger
                 continue;
             }
-            int category = categoriesByModifier.get(mod.identifier).getValue();
+            int category = categoriesByModifier.get(mod.identifier.getValue()).getValue();
 
             if (mod.cost > budgets[category]) {
                 continue;
@@ -244,12 +324,12 @@ public class MobScaling {
             System.out.println("Applying " + mod.identifier); // TODO: remove
             budgets[category] -= mod.cost;
             switch (mod.identifier) {
-                case "speed-2" ->
+                case SPEED_2 ->
                         mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 1));
-                case "strength-2" ->
+                case STRENGTH_2 ->
                         mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, StatusEffectInstance.INFINITE, 1));
                 default ->
-                        System.out.println("uh oh, " + mod.identifier + " was not a valid modifier!!!"); //TODO: use logger
+                        System.out.println("uh oh, " + mod.identifier.getValue() + " was not a valid modifier!!!"); //TODO: use logger
             }
         }
 
@@ -286,20 +366,20 @@ public class MobScaling {
     }
 
     public static ScoreboardObjective getScalingObjective(Scoreboard scoreboard) {
-        assert(scoreboard != null);
+        if (!(scoreboard != null)) throw new AssertionError();
 
         ScoreboardObjective scalingPointsObjective = scoreboard.getNullableObjective(OBJECTIVE_SCALING_POINTS);
         if (scalingPointsObjective == null) {
             scalingPointsObjective = scoreboard.addObjective(OBJECTIVE_SCALING_POINTS, ScoreboardCriterion.DUMMY, scalingPointsLocalization,
                     ScoreboardCriterion.RenderType.INTEGER, true, null);
         }
-        assert(scalingPointsObjective != null); // sanity check
-        assert(scalingPointsObjective.getScoreboard() == scoreboard); // sanity check
+        if (!(scalingPointsObjective != null)) throw new AssertionError(); // sanity check
+        if (!(scalingPointsObjective.getScoreboard() == scoreboard)) throw new AssertionError(); // sanity check
         return scalingPointsObjective;
     }
 
     public static void setScalingPoints(MobEntity mob, int scalingPoints) {
-        assert(mob != null);
+        if (!(mob != null)) throw new AssertionError();
 
         Scoreboard scoreboard = mob.getEntityWorld().getScoreboard();
         ScoreboardObjective objective = getScalingObjective(scoreboard);
@@ -308,7 +388,7 @@ public class MobScaling {
     }
 
     public static int getScalingPoints(MobEntity mob, int scalingPoints) {
-        assert(mob != null);
+        if (!(mob != null)) throw new AssertionError();
 
         Scoreboard scoreboard = mob.getEntityWorld().getScoreboard();
         ScoreAccess score = scoreboard.getOrCreateScore(mob, getScalingObjective(scoreboard));
@@ -320,9 +400,9 @@ public class MobScaling {
     }
 
     private static int[] partitionInt(Random random, int total, int numPartitions) {
-        assert(random != null);
-        assert(total >= 0);
-        assert(numPartitions >= 1);
+        if (!(random != null)) throw new AssertionError();
+        if (!(total >= 0)) throw new AssertionError();
+        if (!(numPartitions >= 1)) throw new AssertionError();
 
         // Insert numPartitions - 1 cuts randomly in [0, total].
         int numCuts = numPartitions - 1;
@@ -344,8 +424,8 @@ public class MobScaling {
     }
 
     private static int[] shuffledRange(Random random, int n) {
-        assert(random != null);
-        assert(n >= 0);
+        if (!(random != null)) throw new AssertionError();
+        if (!(n >= 0)) throw new AssertionError();
 
         int[] arr = new int[n];
         for (int i = 0; i < n; i++) {

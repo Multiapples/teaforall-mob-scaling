@@ -42,6 +42,6 @@ public class ExampleMod implements ModInitializer {
 				logger.warn("Could not write file to " + configFilePath.toASCIIString() + ".");
 			}
 		}
-		MobScaling.initialize();
+		MobScaling.initialize(config, logger);
 	}
 }
