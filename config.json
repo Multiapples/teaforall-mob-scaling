@@ -95,15 +95,15 @@
           "endDist": 500,
           "startMinPoints": -100,
           "startMaxPoints": -50,
-          "endMinPoints": -50,
-          "endMaxPoints": 300
+          "endMinPoints": -100,
+          "endMaxPoints": 100
         },
         {
           "startDist": 500,
           "endDist": 30000000,
-          "startMinPoints": -50,
-          "startMaxPoints": 300,
-          "endMinPoints": 1000000,
+          "startMinPoints": -100,
+          "startMaxPoints": 100,
+          "endMinPoints": 300000,
           "endMaxPoints": 1200000
         }
       ],
@@ -121,8 +121,8 @@
           "endDist": 30000000,
           "startMinPoints": -300,
           "startMaxPoints": 300,
-          "endMinPoints": 1000000,
-          "endMaxPoints": 7000000
+          "endMinPoints": 200000,
+          "endMaxPoints": 2000000
         }
       ]
     },
@@ -174,13 +174,25 @@
     },
     "mobScalingOverrides": {
       "zombie": {
-        "healthCost": 6
+        "healthCost": 6,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.5
+          }
+        }
       },
       "creeper": {
         "healthRealloc": 0.5
       },
       "skeleton": {
-        "healthCost": 6
+        "healthCost": 6,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.5
+          }
+        }
       },
       "spider": {
         "healthCost": 6
@@ -218,7 +230,13 @@
         "healthCost": 6
       },
       "phantom": {
-        "healthCost": 6
+        "healthCost": 6,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 200,
+            "failureChance": 0.75
+          }
+        }
       },
       "slime": {
 
@@ -242,7 +260,7 @@
 
       },
       "vex": {
-
+        "healthCost": 50
       },
       "guardian": {
 
