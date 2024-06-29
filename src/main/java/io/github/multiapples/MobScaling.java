@@ -27,8 +27,18 @@ import java.util.stream.Collectors;
 public class MobScaling {
     private enum DIMENSION { OVERWORLD, NETHER, END }
     private enum MODIFIERS {
+        SPEED_1("speed-1"),
         SPEED_2("speed-2"),
-        STRENGTH_2("strength-2");
+        SPEED_3("speed-3"),
+        SPEED_4("speed-4"),
+        SPEED_5("speed-5"),
+        STRENGTH_1("strength-1"),
+        STRENGTH_2("strength-2"),
+        STRENGTH_3("strength-3"),
+        STRENGTH_4("strength-4"),
+        INVISIBILITY("invisibility"),
+        FIRE_RESISTANCE("fire-resistance"),
+        RESISTANCE_1("resistance-1");
         public static final Map<String, MODIFIERS> BY_IDENTIFIER = Arrays.stream(MODIFIERS.values())
                 .collect(Collectors.toMap(MODIFIERS::getValue, e -> e));
         private final String value;
@@ -133,8 +143,18 @@ public class MobScaling {
         JsonObject json = config.mobScaling;
 
         // Init modifier categories
+        categoriesByModifier.put(MODIFIERS.SPEED_1.getValue(), MODIFIER_CATEGORIES.TECH);
         categoriesByModifier.put(MODIFIERS.SPEED_2.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.SPEED_3.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.SPEED_4.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.SPEED_5.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.STRENGTH_1.getValue(), MODIFIER_CATEGORIES.DAMAGE);
         categoriesByModifier.put(MODIFIERS.STRENGTH_2.getValue(), MODIFIER_CATEGORIES.DAMAGE);
+        categoriesByModifier.put(MODIFIERS.STRENGTH_3.getValue(), MODIFIER_CATEGORIES.DAMAGE);
+        categoriesByModifier.put(MODIFIERS.STRENGTH_4.getValue(), MODIFIER_CATEGORIES.DAMAGE);
+        categoriesByModifier.put(MODIFIERS.INVISIBILITY.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.FIRE_RESISTANCE.getValue(), MODIFIER_CATEGORIES.TECH);
+        categoriesByModifier.put(MODIFIERS.RESISTANCE_1.getValue(), MODIFIER_CATEGORIES.HEALTH);
         if (!(categoriesByModifier.entrySet()
                 .stream()
                 .anyMatch(entry -> isInIntRange(entry.getValue().getValue(), 0, NUMBER_OF_POINT_CATEGORIES - 1))))
@@ -201,25 +221,27 @@ public class MobScaling {
             ScalingParameters override = new ScalingParameters(defaultScalingParameters);
             override.healthRealloc = new JsonOption<>(body).get("healthRealloc").unwrapAsNumber(defaultScalingParameters.healthRealloc).floatValue();
             override.healthCost = new JsonOption<>(body).get("healthCost").unwrapAsNumber(defaultScalingParameters.healthCost).intValue();
-            for (Map.Entry<String, JsonElement> modEntry : jsonOverrideModifiers.asMap().entrySet()) {
-                String modIdentifierStr = modEntry.getKey();
-                JsonObject modBody = modEntry.getValue().getAsJsonObject();
-                if (!MODIFIERS.BY_IDENTIFIER.containsKey(modIdentifierStr)) {
-                    logger.info("Invalid modifier \"" + modIdentifierStr + "\" in config $mobScaling.mobScalingOverrides." + identifier + ".modifiers");
-                    throw new IllegalStateException();
-                }
-                MODIFIERS modIdentifier = MODIFIERS.BY_IDENTIFIER.get(modIdentifierStr);
-                JsonOption<JsonElement> cost = new JsonOption<>(modBody).get("cost");
-                JsonOption<JsonElement> failureChance = new JsonOption<>(modBody).get("failureChance");
-                if (override.modifiersByIdentifier.containsKey(modIdentifier)) {
-                    if (cost.elementExists())
-                        override.modifiersByIdentifier.get(modIdentifier).cost = cost.unwrapAsNumber().intValue();
-                    if (failureChance.elementExists())
-                        override.modifiersByIdentifier.get(modIdentifier).failureChance = failureChance.unwrapAsNumber().floatValue();
-                } else {
-                    override.modifiersByIdentifier.put(modIdentifier,
-                            new ScalingModifier(modIdentifier, cost.unwrapAsNumber().intValue(),
-                                    failureChance.unwrapAsNumber().floatValue()));
+            if (jsonOverrideModifiers != null) {
+                for (Map.Entry<String, JsonElement> modEntry : jsonOverrideModifiers.asMap().entrySet()) {
+                    String modIdentifierStr = modEntry.getKey();
+                    JsonObject modBody = modEntry.getValue().getAsJsonObject();
+                    if (!MODIFIERS.BY_IDENTIFIER.containsKey(modIdentifierStr)) {
+                        logger.info("Invalid modifier \"" + modIdentifierStr + "\" in config $mobScaling.mobScalingOverrides." + identifier + ".modifiers");
+                        throw new IllegalStateException();
+                    }
+                    MODIFIERS modIdentifier = MODIFIERS.BY_IDENTIFIER.get(modIdentifierStr);
+                    JsonOption<JsonElement> cost = new JsonOption<>(modBody).get("cost");
+                    JsonOption<JsonElement> failureChance = new JsonOption<>(modBody).get("failureChance");
+                    if (override.modifiersByIdentifier.containsKey(modIdentifier)) {
+                        if (cost.elementExists())
+                            override.modifiersByIdentifier.get(modIdentifier).cost = cost.unwrapAsNumber().intValue();
+                        if (failureChance.elementExists())
+                            override.modifiersByIdentifier.get(modIdentifier).failureChance = failureChance.unwrapAsNumber().floatValue();
+                    } else {
+                        override.modifiersByIdentifier.put(modIdentifier,
+                                new ScalingModifier(modIdentifier, cost.unwrapAsNumber().intValue(),
+                                        failureChance.unwrapAsNumber().floatValue()));
+                    }
                 }
             }
             scalingOverridesByMob.put(Registries.ENTITY_TYPE.get(Identifier.of(identifier)), override);
@@ -253,8 +275,8 @@ public class MobScaling {
             if (!ramp.inRange(dist)) {
                 continue;
             }
-            int pointsMin = (int)MathHelper.map(dist, ramp.startDist, ramp.endDist, ramp.startMinPoints, ramp.endMinPoints);
-            int pointsMax = (int)MathHelper.map(dist, ramp.startDist, ramp.endDist, ramp.startMaxPoints, ramp.endMaxPoints);
+            int pointsMin = (int)MathHelper.map((double)dist, ramp.startDist, ramp.endDist, ramp.startMinPoints, ramp.endMinPoints);
+            int pointsMax = (int)MathHelper.map((double)dist, ramp.startDist, ramp.endDist, ramp.startMaxPoints, ramp.endMaxPoints);
             scalingPoints = random.nextBetween(pointsMin, pointsMax);
             break;
         }
@@ -323,10 +345,30 @@ public class MobScaling {
             System.out.println("Applying " + mod.identifier); // TODO: remove
             budgets[category] -= mod.cost;
             switch (mod.identifier) {
+                case SPEED_1 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 0));
                 case SPEED_2 ->
                         mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 1));
+                case SPEED_3 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 2));
+                case SPEED_4 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 3));
+                case SPEED_5 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, StatusEffectInstance.INFINITE, 4));
+                case STRENGTH_1 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, StatusEffectInstance.INFINITE, 0));
                 case STRENGTH_2 ->
                         mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, StatusEffectInstance.INFINITE, 1));
+                case STRENGTH_3 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, StatusEffectInstance.INFINITE, 2));
+                case STRENGTH_4 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, StatusEffectInstance.INFINITE, 3));
+                case INVISIBILITY ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, StatusEffectInstance.INFINITE, 0));
+                case FIRE_RESISTANCE ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, StatusEffectInstance.INFINITE, 0));
+                case RESISTANCE_1 ->
+                        mob.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, StatusEffectInstance.INFINITE, 0));
                 default ->
                         System.out.println("uh oh, " + mod.identifier.getValue() + " was not a valid modifier!!!"); //TODO: use logger
             }
