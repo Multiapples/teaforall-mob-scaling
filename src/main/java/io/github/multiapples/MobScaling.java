@@ -52,9 +52,8 @@ public class MobScaling {
         }
     }
     private static final String OBJECTIVE_SCALING_POINTS = "teaforallscalingpoints";
+    private static final String OBJECTIVE_DOWNED_ENDER_DRAGON = "teaforalldownededragon";
     private static final String PERSISTENT_MODIFIER_HEALTH_SCALING = "teaforallmobscaling";
-    private static final Text scalingPointsLocalization = Text.of("Scaling Points"); // TODO: Localization
-
     private static final int NUMBER_OF_POINT_CATEGORIES = 3;
     private static final Collection<EntityType<?>> scalingEligible = new HashSet<>();
     private static final Map<DIMENSION, List<Ramping>> rampingsByDimension = new HashMap<>();
@@ -370,7 +369,7 @@ public class MobScaling {
 
         ScoreboardObjective scalingPointsObjective = scoreboard.getNullableObjective(OBJECTIVE_SCALING_POINTS);
         if (scalingPointsObjective == null) {
-            scalingPointsObjective = scoreboard.addObjective(OBJECTIVE_SCALING_POINTS, ScoreboardCriterion.DUMMY, scalingPointsLocalization,
+            scalingPointsObjective = scoreboard.addObjective(OBJECTIVE_SCALING_POINTS, ScoreboardCriterion.DUMMY, Text.of(OBJECTIVE_SCALING_POINTS),
                     ScoreboardCriterion.RenderType.INTEGER, true, null);
         }
         if (!(scalingPointsObjective != null)) throw new AssertionError(); // sanity check
@@ -393,6 +392,23 @@ public class MobScaling {
         Scoreboard scoreboard = mob.getEntityWorld().getScoreboard();
         ScoreAccess score = scoreboard.getOrCreateScore(mob, getScalingObjective(scoreboard));
         return score.getScore();
+    }
+
+    public static void flagDownedEnderDragon(Scoreboard scoreboard) {
+        if (!(scoreboard != null)) throw new AssertionError();
+
+        ScoreboardObjective flag = scoreboard.getNullableObjective(OBJECTIVE_DOWNED_ENDER_DRAGON);
+        if (flag == null) {
+            scoreboard.addObjective(OBJECTIVE_DOWNED_ENDER_DRAGON, ScoreboardCriterion.DUMMY, Text.of(OBJECTIVE_DOWNED_ENDER_DRAGON),
+                    ScoreboardCriterion.RenderType.INTEGER, true, null);
+        }
+    }
+
+    public static boolean getFlagDownedEnderDragon(Scoreboard scoreboard) {
+        if (!(scoreboard != null)) throw new AssertionError();
+
+        ScoreboardObjective flag = scoreboard.getNullableObjective(OBJECTIVE_DOWNED_ENDER_DRAGON);
+        return flag != null;
     }
 
     private static boolean mobEligibleForScaling(MobEntity mob) {
