@@ -1,6 +1,6 @@
 package io.github.multiapples.mixin;
 
-import io.github.multiapples.ExampleMod;
+import io.github.multiapples.TeaForAllMobScaling;
 import io.github.multiapples.MobScaling;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -18,7 +18,7 @@ public abstract class PlayerEntityMixin {
     protected void tick(CallbackInfo ci) {
         PlayerEntity that = (PlayerEntity)(Object)this;
         if (that.getEntityWorld().getRegistryKey() == World.NETHER) {
-            if (that.getPos().getY() >= ExampleMod.config.netherDOTYlevel
+            if (that.getPos().getY() >= TeaForAllMobScaling.config.netherDOTYlevel
                     && !MobScaling.getFlagDownedEnderDragon(that.getScoreboard())) {
 
                 boolean success = that.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER,
