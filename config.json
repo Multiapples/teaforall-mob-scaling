@@ -1,5 +1,6 @@
 {
   "netherDOT": false,
+  "netherDOTYlevel": 123.5,
   "dragonBuffsMobs": false,
   "dragonBuffsMobsPoints": 2000,
   "fartherStrongholdGen": false,
@@ -18,28 +19,28 @@
           "endDist": 500,
           "startMinPoints": 20,
           "startMaxPoints": 40,
-          "endMinPoint": 500,
-          "endMaxPoint": 1000
+          "endMinPoints": 500,
+          "endMaxPoints": 1000
         }
       ],
       "nether": [
         {
-          "startDist": 50,
-          "endDist": 500,
+          "startDist": 2,
+          "endDist": 100,
           "startMinPoints": 20,
           "startMaxPoints": 40,
-          "endMinPoint": 500,
-          "endMaxPoint": 1000
+          "endMinPoints": 500,
+          "endMaxPoints": 1000
         }
       ],
       "end": [
         {
-          "startDist": 50,
-          "endDist": 500,
+          "startDist": 0,
+          "endDist": 100,
           "startMinPoints": 20,
           "startMaxPoints": 40,
-          "endMinPoint": 500,
-          "endMaxPoint": 1000
+          "endMinPoints": 5000,
+          "endMaxPoints": 10000
         }
       ]
     },
@@ -54,19 +55,19 @@
       }
     },
     "mobScalingOverrides": {
-      "healthRealloc": 0.05,
       "creeper": {
+        "healthRealloc": 0.05,
         "modifiers": {
-          "speed-2": {
+          "strength-2": {
             "cost": 15,
-            "failureChance": 50
+            "failureChance": 0.5
           }
         }
       },
       "skeleton": {
-        "healthCost": 10,
+        "healthCost": 12,
         "modifiers": {
-          "strength-2": {
+          "speed-2": {
             "cost": 30
           }
         }
