@@ -278,7 +278,12 @@
 
       },
       "piglin": {
-
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.5
+          }
+        }
       },
       "zoglin": {
         "healthCost": 6
@@ -287,7 +292,12 @@
         "healthCost": 6
       },
       "piglin_brute": {
-
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.25
+          }
+        }
       },
       "ghast": {
 
