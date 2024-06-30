@@ -21,8 +21,7 @@ The exact generation mechanics are somewhat configurable and described further d
 Players take constant Wither damage on the roof of the Nether until the Ender Dragon has been defeated.
 The exact Y-level can be configured.
 ### Stronghold Dead Zone
-Prevents strongholds from generating within a configurable block radius around (0,0).
-This may require the mod to be installed before world gen.
+Prevents strongholds from being discovered via `/locate` or ender eyes within a configurable block radius around (0,0).
 
 ## Default Config
 
@@ -50,7 +49,7 @@ See the default config for reference.
 
 * `netherDOT : boolean` Whether to enable the nether roof DoT effect. (Default `true`)
 * `netherDOTYlevel : float` Nether DoT begins above this Y-level. (Default `123.5`)
-* `strongholdDeadZone : double` Strongholds cannot generate within this radius. (Default `6000.0`)
+* `strongholdDeadZone : double` Strongholds cannot be located within this radius. (Default `6000.0`)
 * `mobScaling.eligibleMobs` Array of MobEntity identifiers. Only these mobs will be scaled.
 * `mobScaling.rampings.overworld` Array of ramping segments to control points over distance in the overworld.
 It is a similar case for the nether and end.
