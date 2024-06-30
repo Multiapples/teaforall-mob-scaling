@@ -1,7 +1,7 @@
 # TeaForAll Mob Scaling
 
 This is a configurable server-side plugin for scaling mob stats 
-the further they spawn from (0,0) in the overworld, nether, and end.
+the further they spawn horizontally from (0,0) in the overworld, nether, and end.
 
 ## Mob Scaling Effects
 
@@ -49,7 +49,7 @@ See the default config for reference.
 
 * `netherDOT : boolean` Whether to enable the nether roof DoT effect. (Default `true`)
 * `netherDOTYlevel : float` Nether DoT begins above this Y-level. (Default `123.5`)
-* `strongholdDeadZone : double` Strongholds cannot be located within this radius. (Default `6000.0`)
+* `strongholdDeadZone : double` Strongholds will not be located within this radius. (Default `6000.0`)
 * `mobScaling.eligibleMobs` Array of MobEntity identifiers. Only these mobs will be scaled.
 * `mobScaling.rampings.overworld` Array of ramping segments to control points over distance in the overworld.
 It is a similar case for the nether and end.
@@ -59,11 +59,11 @@ It is a similar case for the nether and end.
   * When a mobs spawns in the middle of the interval, the point range is linearly interpolated between start and end.
   * Any mob that doesn't spawn in a ramping interval receives zero points. 
     Mobs in overlapping intervals pick the first interval in the array.
-  * Point ranges can go negative as mobs with less than or equal to zero points are unaltered.
+  * Point ranges can go negative, but mobs with less than or equal to zero points are unaltered.
 * `mobScaling.defaultScaling` Base parameters that all mobs use initially for mob scaling.
   * `healthCost : int` When leftover points are converted into max health, every `healthCost` number of points is converted into 1 hp (0.5 hearts).
     Must be greater than zero.
-  * `healthRealloc : float` After points are partition into categories but before modifiers are applied,
+  * `healthRealloc : float` After points are partitioned into categories but before modifiers are applied,
     `healthRealloc * healthPoints` points are taken from the health category and distributed evenly to the other categories.
     Use this to encourage more effects and less hp scaling.
   * `modifiers` Table that defines available modifiers and their attributes. See Modifier Identifiers for ID's.
