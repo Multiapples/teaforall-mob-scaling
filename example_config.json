@@ -233,8 +233,8 @@
         "healthCost": 6,
         "modifiers": {
           "fire-resistance": {
-            "cost": 200,
-            "failureChance": 0.75
+            "cost": 100,
+            "failureChance": 0.5
           }
         }
       },
@@ -275,7 +275,12 @@
 
       },
       "hoglin": {
-
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.5
+          }
+        }
       },
       "piglin": {
         "modifiers": {
@@ -309,7 +314,13 @@
 
       },
       "wither_skeleton": {
-        "healthCost": 6
+        "healthCost": 6,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 50,
+            "failureChance": 0.5
+          }
+        }
       },
       "silverfish": {
         "healthCost": 4
