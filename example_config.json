@@ -224,7 +224,13 @@
       },
       "stray": {
         "healthCost": 6,
-        "healthRealloc": 0.5
+        "healthRealloc": 0.5,
+        "modifiers": {
+          "fire-resistance": {
+            "cost": 20,
+            "failureChance": 0.25
+          }
+        }
       },
       "cave_spider": {
         "healthCost": 6
