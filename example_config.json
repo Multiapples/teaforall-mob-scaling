@@ -183,7 +183,21 @@
         }
       },
       "creeper": {
-        "healthRealloc": 0.5
+        "healthRealloc": 0.5,
+        "modifiers": {
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "skeleton": {
         "healthCost": 6,
@@ -191,6 +205,18 @@
           "fire-resistance": {
             "cost": 50,
             "failureChance": 0.5
+          },
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
           }
         }
       },
@@ -229,6 +255,18 @@
           "fire-resistance": {
             "cost": 20,
             "failureChance": 0.25
+          },
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
           }
         }
       },
@@ -241,11 +279,42 @@
           "fire-resistance": {
             "cost": 100,
             "failureChance": 0.5
+          },
+          "speed-1": {
+            "failureChance": 1
+          },
+          "speed-2": {
+            "failureChance": 1
+          },
+          "speed-3": {
+            "failureChance": 1
+          },
+          "speed-4": {
+            "failureChance": 1
+          },
+          "speed-5": {
+            "failureChance": 1
           }
         }
       },
       "slime": {
-
+        "modifiers": {
+          "speed-1": {
+            "failureChance": 1
+          },
+          "speed-2": {
+            "failureChance": 1
+          },
+          "speed-3": {
+            "failureChance": 1
+          },
+          "speed-4": {
+            "failureChance": 1
+          },
+          "speed-5": {
+            "failureChance": 1
+          }
+        }
       },
       "warden": {
 
@@ -263,7 +332,20 @@
 
       },
       "evoker": {
-
+        "modifiers": {
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "vex": {
         "healthCost": 50
@@ -275,10 +357,36 @@
 
       },
       "bogged": {
-
+        "modifiers": {
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "breeze": {
-
+        "modifiers": {
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "hoglin": {
         "modifiers": {
@@ -311,10 +419,54 @@
         }
       },
       "ghast": {
-
+        "modifiers": {
+          "speed-1": {
+            "failureChance": 1
+          },
+          "speed-2": {
+            "failureChance": 1
+          },
+          "speed-3": {
+            "failureChance": 1
+          },
+          "speed-4": {
+            "failureChance": 1
+          },
+          "speed-5": {
+            "failureChance": 1
+          },
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "magma_cube": {
-
+        "modifiers": {
+          "speed-1": {
+            "failureChance": 1
+          },
+          "speed-2": {
+            "failureChance": 1
+          },
+          "speed-3": {
+            "failureChance": 1
+          },
+          "speed-4": {
+            "failureChance": 1
+          },
+          "speed-5": {
+            "failureChance": 1
+          }
+        }
       },
       "blaze": {
 
@@ -345,7 +497,36 @@
         }
       },
       "shulker": {
-        "healthCost": 50
+        "healthCost": 50,
+        "modifiers": {
+          "speed-1": {
+            "failureChance": 1
+          },
+          "speed-2": {
+            "failureChance": 1
+          },
+          "speed-3": {
+            "failureChance": 1
+          },
+          "speed-4": {
+            "failureChance": 1
+          },
+          "speed-5": {
+            "failureChance": 1
+          },
+          "strength-1": {
+            "failureChance": 1
+          },
+          "strength-2": {
+            "failureChance": 1
+          },
+          "strength-3": {
+            "failureChance": 1
+          },
+          "strength-4": {
+            "failureChance": 1
+          }
+        }
       },
       "endermite": {
         "healthCost": 6,
